@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Fonts</string>
+
+    <string name="category">類別:</string>
+    <string name="kind">種類:</string>
+    <string name="family">家族:</string>
+    <string name="version">版本:</string>
+    <string name="last_modified">最後修改時間:</string>
+    <string name="subsets">子集合:</string>
+
+    <string name="sort_default">預設</string>
+    <string name="sort_category">類別</string>
+    <string name="sort_family">家族</string>
+    <string name="sort_kind">種類</string>
+    <string name="sort_version">版本</string>
+    <string name="sort_last_modified">最後修改日期</string>
+</resources>

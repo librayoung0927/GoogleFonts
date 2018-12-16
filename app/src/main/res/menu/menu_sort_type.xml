@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/sort_default"
+        android:orderInCategory="100"
+        android:title="@string/sort_default"
+        app:showAsAction="collapseActionView"/>
+
+    <item
+        android:id="@+id/sort_category"
+        android:orderInCategory="100"
+        android:title="@string/sort_category"
+        app:showAsAction="collapseActionView"/>
+
+    <item
+        android:id="@+id/sort_kind"
+        android:orderInCategory="100"
+        android:title="@string/sort_kind"
+        app:showAsAction="collapseActionView"/>
+
+    <item
+        android:id="@+id/sort_family"
+        android:orderInCategory="100"
+        android:title="@string/sort_family"
+        app:showAsAction="collapseActionView"/>
+
+    <item
+        android:id="@+id/sort_version"
+        android:orderInCategory="100"
+        android:title="@string/sort_version"
+        app:showAsAction="collapseActionView"/>
+
+    <item
+        android:id="@+id/sort_last_modified"
+        android:orderInCategory="100"
+        android:title="@string/sort_last_modified"
+        app:showAsAction="collapseActionView"/>
+</menu>
