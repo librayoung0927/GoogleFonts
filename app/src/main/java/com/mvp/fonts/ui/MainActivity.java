@@ -1,6 +1,7 @@
 package com.mvp.fonts.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,11 +10,16 @@ import android.view.View;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.liulishuo.filedownloader.FileDownloadMonitor;
+import com.liulishuo.filedownloader.FileDownloader;
+import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 import com.mvp.fonts.Comparator.CategoryComparator;
 import com.mvp.fonts.Comparator.FamilyComparator;
 import com.mvp.fonts.Comparator.KindComparator;
 import com.mvp.fonts.Comparator.LastModifiedComparator;
 import com.mvp.fonts.Comparator.VersionComparator;
+import com.mvp.fonts.MultiTask.GlobalMonitor;
+import com.mvp.fonts.MultiTask.TasksManager;
 import com.mvp.fonts.R;
 import com.mvp.fonts.adapter.FontRecyclerAdapter;
 import com.mvp.fonts.constants.Field;
@@ -28,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private Gson mGson;
+    private Context mContext;
     private Activity mActivity;
     private RecyclerView mRvFont;
     private List<RecyclerBaseItem> mFontList;
@@ -96,10 +104,35 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        TasksManager.getImpl(mContext).onDestroy();
+        mFontRecyclerAdapter = null;
+        FileDownloader.getImpl().pauseAll();
+
+        FileDownloader.getImpl().unBindServiceIfIdle();
+        FileDownloadMonitor.releaseGlobalMonitor();
+        super.onDestroy();
+    }
+
     private void init() {
+        mContext = getApplicationContext();
+
+        FileDownloader.setupOnApplicationOnCreate(getApplication())
+                .connectionCreator(new FileDownloadUrlConnection
+                        .Creator(new FileDownloadUrlConnection.Configuration()
+                        .connectTimeout(15_000) // set connection timeout.
+                        .readTimeout(15_000)
+                        // set read timeout.
+                ))
+                .commit();
+
+
+        FileDownloadMonitor.setGlobalMonitor(GlobalMonitor.getImpl());
         mActivity = this;
         mFontList = new ArrayList<>();
         mGson = new Gson();
+        TasksManager.getImpl(mContext).onCreate(new WeakReference<>(this));
     }
 
     private void bindsViews() {
@@ -116,11 +149,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setAdapter() {
+
         if (mFontRecyclerAdapter == null) {
-            mFontRecyclerAdapter = new FontRecyclerAdapter(mActivity, mFontList);
+            mFontRecyclerAdapter = new FontRecyclerAdapter(mContext, mFontList);
             mRvFont.setAdapter(mFontRecyclerAdapter);
         } else {
+            mFontRecyclerAdapter.clear();
             mFontRecyclerAdapter.setList(mFontList);
+        }
+    }
+
+    private void initTask() {
+        if (mFontList.size() > 0) {
+            int size = mFontList.size();
+            for (int i = 0; i < size; i++) {
+                Font font = (Font) mFontList.get(i);
+                HashMap.Entry<String, String> entry = font.getFiles().entrySet().iterator().next();
+                String url = entry.getValue();
+
+                StringBuilder subsetsBuilder = new StringBuilder();
+
+                if (font.getSubsets() != null) {
+                    for (String string : font.getSubsets()) {
+                        subsetsBuilder.append(string).append("\n");
+                    }
+                }
+
+
+                TasksManager.getImpl(mContext).addTask(url, font.getKind(), font.getFamily(),
+                        font.getCategory(), font.getVersion(), font.getLastModified(), subsetsBuilder.toString());
+            }
         }
     }
 
@@ -163,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
                             ((Font) mFontList.get(i)).setFiles(fileList.get(i));
                         }
 
+                        initTask();
                         setAdapter();
                     } catch (JSONException e) {
                         LogUtils.e(TAG, e.toString());
@@ -173,5 +232,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void postNotifyDataChanged() {
+        if (mFontRecyclerAdapter != null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mFontRecyclerAdapter != null) {
+                        mFontRecyclerAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+        }
     }
 }

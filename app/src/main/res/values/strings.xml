@@ -1,17 +1,32 @@
 <resources>
     <string name="app_name">Fonts</string>
-
     <string name="category">類別:</string>
     <string name="kind">種類:</string>
     <string name="family">家族:</string>
     <string name="version">版本:</string>
     <string name="last_modified">最後修改時間:</string>
     <string name="subsets">子集合:</string>
-
     <string name="sort_default">預設</string>
     <string name="sort_category">類別</string>
     <string name="sort_family">家族</string>
     <string name="sort_kind">種類</string>
     <string name="sort_version">版本</string>
     <string name="sort_last_modified">最後修改日期</string>
+
+    <string name="tasks_manager_demo_title">任務管理器案例</string>
+    <string name="tasks_manager_demo_name" formatted="false">任務: %d</string>
+    <string name="tasks_manager_demo_status_loading">狀態: 加載中...</string>
+    <string name="tasks_manager_demo_status_pending">狀態: 隊列中</string>
+    <string name="tasks_manager_demo_status_started">狀態: 開始下載</string>
+    <string name="tasks_manager_demo_status_connected">狀態: 已連接上</string>
+    <string name="tasks_manager_demo_status_progress">狀態: 下載中...</string>
+    <string name="tasks_manager_demo_status_downloading" formatted="false">狀態: 正在下載 %d</string>
+    <string name="tasks_manager_demo_status_error">狀態: 出錯</string>
+    <string name="tasks_manager_demo_status_paused">狀態: 暫停</string>
+    <string name="tasks_manager_demo_status_completed">狀態: 下載完成</string>
+    <string name="tasks_manager_demo_status_not_downloaded">狀態: 未下載</string>
+
+    <string name="start">Start</string>
+    <string name="pause">Pause</string>
+    <string name="delete">Delete</string>
 </resources>

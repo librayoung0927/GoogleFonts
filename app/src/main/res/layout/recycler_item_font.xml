@@ -1,13 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
-              android:layout_height="300dp"
-              android:orientation="vertical">
+              android:layout_height="match_parent"
+              android:background="@drawable/border_bottom"
+              android:orientation="horizontal">
 
     <TextView
         android:id="@+id/tvFontInfo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp"/>
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="10dp"
+        android:textColor="@color/color_0c0c0c"/>
 
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTaskName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            tools:text="task: 1231313"/>
+
+        <TextView
+            android:id="@+id/tvTaskStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:textColor="@android:color/secondary_text_dark"
+            android:textSize="16sp"
+            tools:text="status: connected"/>
+
+        <ProgressBar
+            android:id="@+id/pbTask"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_marginTop="5dp"/>
+
+
+        <Button
+            android:id="@+id/btnTaskAction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            tools:text="Start"/>
+    </LinearLayout>
 </LinearLayout>
