@@ -2,11 +2,14 @@ package com.mvp.fonts.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -53,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     private Activity mActivity;
     private RecyclerView mRvFont;
     private List<RecyclerBaseItem> mFontList;
+    private ProgressBar mProgressBar;
+    private ProgressBar mProgressBarHorizontal;
+    private TextView mTvCount;
     private FontRecyclerAdapter mFontRecyclerAdapter;
 
     @Override
@@ -117,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
         mContext = getApplicationContext();
-
         FileDownloader.setupOnApplicationOnCreate(getApplication())
                 .connectionCreator(new FileDownloadUrlConnection
                         .Creator(new FileDownloadUrlConnection.Configuration()
@@ -137,6 +142,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void bindsViews() {
         mRvFont = findViewById(R.id.rvFont);
+        mProgressBar = findViewById(R.id.progressBar);
+        mProgressBarHorizontal = findViewById(R.id.progressbarHorizontal);
+        mTvCount = findViewById(R.id.tvCount);
     }
 
 
@@ -149,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setAdapter() {
-
         if (mFontRecyclerAdapter == null) {
             mFontRecyclerAdapter = new FontRecyclerAdapter(mContext, mFontList);
             mRvFont.setAdapter(mFontRecyclerAdapter);
@@ -159,29 +166,74 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initTask() {
-        if (mFontList.size() > 0) {
-            int size = mFontList.size();
-            for (int i = 0; i < size; i++) {
-                Font font = (Font) mFontList.get(i);
-                HashMap.Entry<String, String> entry = font.getFiles().entrySet().iterator().next();
-                String url = entry.getValue();
 
-                StringBuilder subsetsBuilder = new StringBuilder();
+    private static class InsertIntoDatabase extends AsyncTask<Void, Void, Void> {
+        private WeakReference<MainActivity> mActivityWeakReference;
 
-                if (font.getSubsets() != null) {
-                    for (String string : font.getSubsets()) {
-                        subsetsBuilder.append(string).append("\n");
+        private InsertIntoDatabase(MainActivity activity) {
+            mActivityWeakReference = new WeakReference<>(activity);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Activity activity = mActivityWeakReference.get();
+
+            ((MainActivity) activity).mProgressBarHorizontal.setVisibility(View.INVISIBLE);
+            ((MainActivity) activity).mProgressBar.setVisibility(View.INVISIBLE);
+            ((MainActivity) activity).mTvCount.setVisibility(View.INVISIBLE);
+            ((MainActivity) activity).setAdapter();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Activity activity = mActivityWeakReference.get();
+            ((MainActivity) activity).mProgressBarHorizontal.setVisibility(View.VISIBLE);
+            ((MainActivity) activity).mProgressBar.setVisibility(View.VISIBLE);
+            ((MainActivity) activity).mTvCount.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Activity activity = mActivityWeakReference.get();
+            if (((MainActivity) activity).mFontList.size() > 0) {
+                int size = ((MainActivity) activity).mFontList.size();
+                for (int i = 0; i < size; i++) {
+                    Font font = (Font) ((MainActivity) activity).mFontList.get(i);
+                    HashMap.Entry<String, String> entry = font.getFiles().entrySet().iterator().next();
+                    String url = entry.getValue();
+
+                    StringBuilder subsetsBuilder = new StringBuilder();
+
+                    if (font.getSubsets() != null) {
+                        for (String string : font.getSubsets()) {
+                            subsetsBuilder.append(string).append("\n");
+                        }
                     }
+
+
+                    TasksManager.getImpl(((MainActivity) activity).mContext).addTask(url, font.getKind(), font.getFamily(),
+                            font.getCategory(), font.getVersion(), font.getLastModified(), subsetsBuilder.toString());
+
+                    ((MainActivity) activity).updateProgress(i, size);
+                    LogUtils.d(TAG, " progress : " + String.valueOf(i));
                 }
-
-
-                TasksManager.getImpl(mContext).addTask(url, font.getKind(), font.getFamily(),
-                        font.getCategory(), font.getVersion(), font.getLastModified(), subsetsBuilder.toString());
             }
+            return null;
         }
     }
 
+    private void updateProgress(final int i, final int size) {
+        mActivity.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                mProgressBarHorizontal.setProgress(i);
+                mTvCount.setText(String.format(getString(R.string.count), i, size));
+            }
+        });
+    }
 
     @SuppressWarnings("unchecked")
     private void pullGoogleAllFonts() {
@@ -216,13 +268,13 @@ public class MainActivity extends AppCompatActivity {
                         }.getType();
 
                         mFontList = mGson.fromJson(fontJsonArray.toString(), listType);
-
+                        mProgressBarHorizontal.setMax(size);
                         for (int i = 0; i < size; i++) {
                             ((Font) mFontList.get(i)).setFiles(fileList.get(i));
                         }
 
-                        initTask();
-                        setAdapter();
+//                        initTask();
+                        new InsertIntoDatabase(((MainActivity) mActivity)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     } catch (JSONException e) {
                         LogUtils.e(TAG, e.toString());
                     }
