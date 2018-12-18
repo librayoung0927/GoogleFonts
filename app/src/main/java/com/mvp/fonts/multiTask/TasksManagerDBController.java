@@ -1,4 +1,4 @@
-package com.mvp.fonts.MultiTask;
+package com.mvp.fonts.multiTask;
 
 import android.content.Context;
 import android.database.Cursor;

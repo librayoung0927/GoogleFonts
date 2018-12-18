@@ -16,8 +16,8 @@ import com.google.gson.reflect.TypeToken;
 import com.liulishuo.filedownloader.FileDownloadMonitor;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
-import com.mvp.fonts.MultiTask.GlobalMonitor;
-import com.mvp.fonts.MultiTask.TasksManager;
+import com.mvp.fonts.multiTask.GlobalMonitor;
+import com.mvp.fonts.multiTask.TasksManager;
 import com.mvp.fonts.R;
 import com.mvp.fonts.adapter.FontRecyclerAdapter;
 import com.mvp.fonts.constants.Field;
@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
 //                Collections.sort(mFontList, new LastModifiedComparator());
 //                break;
 
-
             case R.id.sort_default:
                 mFontRecyclerAdapter.setSort("");
                 break;
@@ -124,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.sort_last_modified:
                 mFontRecyclerAdapter.setSort(Font.LAST_MODIFIED);
                 break;
-
-
         }
 
         setAdapter();
@@ -168,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
         mTvCount = findViewById(R.id.tvCount);
     }
 
-
     private void bindEvents() {
         mRvFont.setLayoutManager(new LinearLayoutManager(mActivity));
         mRvFont.setHasFixedSize(true);
@@ -186,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
             mFontRecyclerAdapter.setList(mFontList);
         }
     }
-
 
     private static class InsertIntoDatabase extends AsyncTask<Void, Void, Void> {
         private WeakReference<MainActivity> mActivityWeakReference;

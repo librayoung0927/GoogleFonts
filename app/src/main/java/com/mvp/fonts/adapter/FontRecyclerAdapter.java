@@ -14,7 +14,7 @@ import com.liulishuo.filedownloader.FileDownloadSampleListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.model.FileDownloadStatus;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
-import com.mvp.fonts.MultiTask.TasksManager;
+import com.mvp.fonts.multiTask.TasksManager;
 import com.mvp.fonts.R;
 import com.mvp.fonts.dataModel.Font;
 import com.mvp.fonts.dataModel.RecyclerBaseItem;
@@ -63,16 +63,13 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
         }
 
         ((FontViewHolder) holder).setItem(font);
-
         ((FontViewHolder) holder).update(font.getID(), position);
         ((FontViewHolder) holder).mBtnTaskAction.setTag(holder);
         ((FontViewHolder) holder).mTvTaskName.setText(font.getName());
 
         TasksManager.getImpl(mContext)
                 .updateViewHolder(((FontViewHolder) holder).mId, ((FontViewHolder) holder));
-
         ((FontViewHolder) holder).mBtnTaskAction.setEnabled(true);
-
 
         if (TasksManager.getImpl(mContext).isReady()) {
             final int status = TasksManager.getImpl(mContext).getStatus(font.getID(), font.getPath());
@@ -105,7 +102,6 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
 
     public class FontViewHolder extends RecyclerView.ViewHolder {
         private TextView mTvFontInfo;
-
         private TextView mTvTaskName;
         private TextView mTvTaskStatus;
         private ProgressBar mPbTask;
@@ -118,11 +114,9 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
             mPosition = position;
         }
 
-
         private void updateDownloaded() {
             mPbTask.setMax(1);
             mPbTask.setProgress(1);
-
             mTvTaskStatus.setText(R.string.tasks_manager_demo_status_completed);
             mBtnTaskAction.setText(R.string.delete);
         }
@@ -150,7 +144,6 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
                     }
 
                     FontViewHolder holder = (FontViewHolder) v.getTag();
-
                     CharSequence action = ((TextView) v).getText();
                     if (action.equals(v.getResources().getString(R.string.pause))) {
                         // to pause
@@ -162,7 +155,6 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
                                 .setPath(font.getPath())
                                 .setCallbackProgressTimes(100)
                                 .setListener(new FileDownloadSampleListener() {
-
                                     private FontViewHolder checkCurrentHolder(final BaseDownloadTask task) {
                                         final FontViewHolder tag = (FontViewHolder) task.getTag();
                                         if (tag.mId != task.getId()) {
@@ -204,8 +196,7 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
                                             return;
                                         }
 
-                                        tag.updateDownloading(FileDownloadStatus.connected, soFarBytes
-                                                , totalBytes);
+                                        tag.updateDownloading(FileDownloadStatus.connected, soFarBytes, totalBytes);
                                         tag.mTvTaskStatus.setText(R.string.tasks_manager_demo_status_connected);
                                     }
 
@@ -217,8 +208,7 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
                                             return;
                                         }
 
-                                        tag.updateDownloading(FileDownloadStatus.progress, soFarBytes
-                                                , totalBytes);
+                                        tag.updateDownloading(FileDownloadStatus.progress, soFarBytes, totalBytes);
                                     }
 
                                     @Override
@@ -260,12 +250,8 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
                                     }
                                 });
 
-                        TasksManager.getImpl(mContext)
-                                .addTaskForViewHolder(task);
-
-                        TasksManager.getImpl(mContext)
-                                .updateViewHolder(holder.mId, holder);
-
+                        TasksManager.getImpl(mContext).addTaskForViewHolder(task);
+                        TasksManager.getImpl(mContext).updateViewHolder(holder.mId, holder);
                         task.start();
                     } else if (action.equals(v.getResources().getString(R.string.delete))) {
                         // to delete

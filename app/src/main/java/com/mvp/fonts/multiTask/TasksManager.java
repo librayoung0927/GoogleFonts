@@ -1,4 +1,4 @@
-package com.mvp.fonts.MultiTask;
+package com.mvp.fonts.multiTask;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -19,7 +19,6 @@ import java.util.List;
 public class TasksManager {
     private static final String TAG = TasksManager.class.getSimpleName();
     private static Context mContext;
-    private static String mSort;
 
     private static class HolderClass {
         private static TasksManager INSTANCE

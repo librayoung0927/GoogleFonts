@@ -174,7 +174,6 @@ public class Font extends RecyclerBaseItem {
         cv.put(VERSION, mVersion);
         cv.put(LAST_MODIFIED, mLastModified);
         cv.put(SUBSETS, mSubsetsString);
-
         return cv;
     }
 }
