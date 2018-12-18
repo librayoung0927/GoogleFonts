@@ -17,11 +17,13 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class TasksManager {
+    private static final String TAG = TasksManager.class.getSimpleName();
     private static Context mContext;
+    private static String mSort;
 
-    private final static class HolderClass {
-        private final static TasksManager INSTANCE
-                = new TasksManager();
+    private static class HolderClass {
+        private static TasksManager INSTANCE
+                = new TasksManager("");
     }
 
     public static TasksManager getImpl(Context context) {
@@ -29,12 +31,17 @@ public class TasksManager {
         return HolderClass.INSTANCE;
     }
 
+    public static void sortInstance(String sort) {
+        HolderClass.INSTANCE = null;
+        HolderClass.INSTANCE = new TasksManager(sort);
+    }
+
     private TasksManagerDBController dbController;
     private List<Font> mFontList;
 
-    private TasksManager() {
+    private TasksManager(String sort) {
         dbController = new TasksManagerDBController(mContext);
-        mFontList = dbController.getAllTasks();
+        mFontList = dbController.getAllTasks(sort);
     }
 
     private SparseArray<BaseDownloadTask> taskSparseArray = new SparseArray<>();

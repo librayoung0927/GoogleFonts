@@ -25,8 +25,16 @@ public class TasksManagerDBController {
         db = openHelper.getWritableDatabase();
     }
 
-    public List<Font> getAllTasks() {
-        final Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+    public List<Font> getAllTasks(String sort) {
+        String sqlString;
+
+        if (TextUtils.isEmpty(sort)) {
+            sqlString = "SELECT * FROM " + TABLE_NAME;
+        } else {
+            sqlString = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + sort;
+        }
+
+        final Cursor c = db.rawQuery(sqlString, null);
 
         final List<Font> list = new ArrayList<>();
         try {
@@ -58,7 +66,7 @@ public class TasksManagerDBController {
     }
 
     public Font addTask(final String url, final String path, String kind, String family, String category,
-                        String version, String lastModified,String subsetsString) {
+                        String version, String lastModified, String subsetsString) {
         if (TextUtils.isEmpty(url) || TextUtils.isEmpty(path)) {
             return null;
         }

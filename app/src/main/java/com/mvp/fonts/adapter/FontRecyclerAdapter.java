@@ -2,6 +2,7 @@ package com.mvp.fonts.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,10 +28,16 @@ import androidx.recyclerview.widget.RecyclerView;
 public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
     public static final int LAYOUT_TYPE_ITEM = 1;
     private Resources mResources;
+    private String mSort;
 
     public FontRecyclerAdapter(Context context, List<RecyclerBaseItem> list) {
         super(context, list);
         mResources = context.getResources();
+    }
+
+    public void setSort(String sort) {
+        mSort = sort;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -47,7 +54,14 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        final Font font = TasksManager.getImpl(mContext).get(position);
+        final Font font;
+        if (TextUtils.isEmpty(mSort)) {
+            font = TasksManager.getImpl(mContext).get(position);
+        } else {
+            TasksManager.sortInstance(mSort);
+            font = TasksManager.getImpl(mContext).get(position);
+        }
+
         ((FontViewHolder) holder).setItem(font);
 
         ((FontViewHolder) holder).update(font.getID(), position);

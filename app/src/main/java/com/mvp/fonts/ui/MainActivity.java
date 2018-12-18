@@ -16,11 +16,6 @@ import com.google.gson.reflect.TypeToken;
 import com.liulishuo.filedownloader.FileDownloadMonitor;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
-import com.mvp.fonts.Comparator.CategoryComparator;
-import com.mvp.fonts.Comparator.FamilyComparator;
-import com.mvp.fonts.Comparator.KindComparator;
-import com.mvp.fonts.Comparator.LastModifiedComparator;
-import com.mvp.fonts.Comparator.VersionComparator;
 import com.mvp.fonts.MultiTask.GlobalMonitor;
 import com.mvp.fonts.MultiTask.TasksManager;
 import com.mvp.fonts.R;
@@ -40,7 +35,6 @@ import org.json.JSONObject;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -82,28 +76,56 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("unchecked")
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            // 如果無database 版本可直接用此方法做排序
+//            case R.id.sort_default:
+//                break;
+//
+//            case R.id.sort_category:
+//                Collections.sort(mFontList, new CategoryComparator());
+//                break;
+//
+//            case R.id.sort_kind:
+//                Collections.sort(mFontList, new KindComparator());
+//                break;
+//
+//            case R.id.sort_family:
+//                Collections.sort(mFontList, new FamilyComparator());
+//                break;
+//
+//            case R.id.sort_version:
+//                Collections.sort(mFontList, new VersionComparator());
+//                break;
+//
+//            case R.id.sort_last_modified:
+//                Collections.sort(mFontList, new LastModifiedComparator());
+//                break;
+
+
             case R.id.sort_default:
+                mFontRecyclerAdapter.setSort("");
                 break;
 
             case R.id.sort_category:
-                Collections.sort(mFontList, new CategoryComparator());
+                mFontRecyclerAdapter.setSort(Font.CATEGORY);
                 break;
 
             case R.id.sort_kind:
-                Collections.sort(mFontList, new KindComparator());
+                mFontRecyclerAdapter.setSort(Font.KIND);
                 break;
 
             case R.id.sort_family:
-                Collections.sort(mFontList, new FamilyComparator());
+                mFontRecyclerAdapter.setSort(Font.FAMILY);
                 break;
 
             case R.id.sort_version:
-                Collections.sort(mFontList, new VersionComparator());
+                mFontRecyclerAdapter.setSort(Font.VERSION);
                 break;
 
             case R.id.sort_last_modified:
-                Collections.sort(mFontList, new LastModifiedComparator());
+                mFontRecyclerAdapter.setSort(Font.LAST_MODIFIED);
                 break;
+
+
         }
 
         setAdapter();
@@ -115,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
         TasksManager.getImpl(mContext).onDestroy();
         mFontRecyclerAdapter = null;
         FileDownloader.getImpl().pauseAll();
-
         FileDownloader.getImpl().unBindServiceIfIdle();
         FileDownloadMonitor.releaseGlobalMonitor();
         super.onDestroy();
@@ -178,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             Activity activity = mActivityWeakReference.get();
-
             ((MainActivity) activity).mProgressBarHorizontal.setVisibility(View.INVISIBLE);
             ((MainActivity) activity).mProgressBar.setVisibility(View.INVISIBLE);
             ((MainActivity) activity).mTvCount.setVisibility(View.INVISIBLE);
@@ -188,10 +208,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Activity activity = mActivityWeakReference.get();
-            ((MainActivity) activity).mProgressBarHorizontal.setVisibility(View.VISIBLE);
-            ((MainActivity) activity).mProgressBar.setVisibility(View.VISIBLE);
-            ((MainActivity) activity).mTvCount.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -199,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
             Activity activity = mActivityWeakReference.get();
             if (((MainActivity) activity).mFontList.size() > 0) {
                 int size = ((MainActivity) activity).mFontList.size();
+
                 for (int i = 0; i < size; i++) {
                     Font font = (Font) ((MainActivity) activity).mFontList.get(i);
                     HashMap.Entry<String, String> entry = font.getFiles().entrySet().iterator().next();
@@ -211,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
                             subsetsBuilder.append(string).append("\n");
                         }
                     }
-
 
                     TasksManager.getImpl(((MainActivity) activity).mContext).addTask(url, font.getKind(), font.getFamily(),
                             font.getCategory(), font.getVersion(), font.getLastModified(), subsetsBuilder.toString());
@@ -245,6 +261,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPreExecute() {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressBarHorizontal.setVisibility(View.VISIBLE);
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        mTvCount.setVisibility(View.VISIBLE);
+                    }
+                });
             }
 
             @Override
@@ -273,8 +297,7 @@ public class MainActivity extends AppCompatActivity {
                             ((Font) mFontList.get(i)).setFiles(fileList.get(i));
                         }
 
-//                        initTask();
-                        new InsertIntoDatabase(((MainActivity) mActivity)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        new InsertIntoDatabase(((MainActivity) mActivity)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                     } catch (JSONException e) {
                         LogUtils.e(TAG, e.toString());
                     }

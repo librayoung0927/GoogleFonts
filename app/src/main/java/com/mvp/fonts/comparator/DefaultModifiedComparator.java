@@ -1,4 +1,4 @@
-package com.mvp.fonts.Comparator;
+package com.mvp.fonts.comparator;
 
 public class DefaultModifiedComparator {
 }

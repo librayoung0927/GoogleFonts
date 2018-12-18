@@ -166,7 +166,7 @@ public class Font extends RecyclerBaseItem {
         ContentValues cv = new ContentValues();
         cv.put(ID, mID);
         cv.put(NAME, mName);
-        cv.put(URL, "http://speed.so-net.net.tw/10mb.zip");
+        cv.put(URL, mUrl);
         cv.put(PATH, mPath);
         cv.put(KIND, mKind);
         cv.put(CATEGORY, mCategory);
