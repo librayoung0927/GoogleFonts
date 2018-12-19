@@ -14,10 +14,10 @@ import com.liulishuo.filedownloader.FileDownloadSampleListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.model.FileDownloadStatus;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
-import com.mvp.fonts.multiTask.TasksManager;
 import com.mvp.fonts.R;
 import com.mvp.fonts.dataModel.Font;
 import com.mvp.fonts.dataModel.RecyclerBaseItem;
+import com.mvp.fonts.multiTask.TasksManager;
 
 import java.io.File;
 import java.util.List;
@@ -56,6 +56,7 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         final Font font;
         if (TextUtils.isEmpty(mSort)) {
+            TasksManager.defaultSortInstance();
             font = TasksManager.getImpl(mContext).get(position);
         } else {
             TasksManager.sortInstance(mSort);
@@ -84,7 +85,7 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
                 ((FontViewHolder) holder).updateNotDownloaded(status, 0, 0);
             } else if (TasksManager.getImpl(mContext).isDownloaded(status)) {
                 // already downloaded and exist
-                ((FontViewHolder) holder).updateDownloaded();
+                ((FontViewHolder) holder).updateDownloaded(font.getPath());
             } else if (status == FileDownloadStatus.progress) {
                 // downloading
                 ((FontViewHolder) holder).updateDownloading(status, TasksManager.getImpl(mContext).getSoFar(font.getID())
@@ -114,11 +115,13 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
             mPosition = position;
         }
 
-        private void updateDownloaded() {
+        private void updateDownloaded(String fontPath) {
             mPbTask.setMax(1);
             mPbTask.setProgress(1);
             mTvTaskStatus.setText(R.string.tasks_manager_demo_status_completed);
             mBtnTaskAction.setText(R.string.delete);
+
+//            mTvFontInfo.setTypeface(TypefaceUtils.getTypeFace(mContext,fontPath));
         }
 
         FontViewHolder(View itemView) {
@@ -245,7 +248,7 @@ public class FontRecyclerAdapter extends RecyclerBaseAdapter<RecyclerBaseItem> {
                                             return;
                                         }
 
-                                        tag.updateDownloaded();
+                                        tag.updateDownloaded(font.getPath());
                                         TasksManager.getImpl(mContext).removeTaskForViewHolder(task.getId());
                                     }
                                 });

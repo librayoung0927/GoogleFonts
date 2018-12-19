@@ -35,6 +35,11 @@ public class TasksManager {
         HolderClass.INSTANCE = new TasksManager(sort);
     }
 
+    public static void defaultSortInstance(){
+        HolderClass.INSTANCE = null;
+        HolderClass.INSTANCE = new TasksManager("");
+    }
+
     private TasksManagerDBController dbController;
     private List<Font> mFontList;
 

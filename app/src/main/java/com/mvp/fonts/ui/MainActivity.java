@@ -16,8 +16,6 @@ import com.google.gson.reflect.TypeToken;
 import com.liulishuo.filedownloader.FileDownloadMonitor;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
-import com.mvp.fonts.multiTask.GlobalMonitor;
-import com.mvp.fonts.multiTask.TasksManager;
 import com.mvp.fonts.R;
 import com.mvp.fonts.adapter.FontRecyclerAdapter;
 import com.mvp.fonts.constants.Field;
@@ -25,6 +23,8 @@ import com.mvp.fonts.dataModel.Font;
 import com.mvp.fonts.dataModel.RecyclerBaseItem;
 import com.mvp.fonts.interfaces.OnAPIListener;
 import com.mvp.fonts.module.apiParams.InParamsAllFonts;
+import com.mvp.fonts.multiTask.GlobalMonitor;
+import com.mvp.fonts.multiTask.TasksManager;
 import com.mvp.fonts.utils.APIUtils;
 import com.mvp.fonts.utils.LogUtils;
 
@@ -44,7 +44,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-
     private Gson mGson;
     private Context mContext;
     private Activity mActivity;
@@ -149,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
                         // set read timeout.
                 ))
                 .commit();
-
 
         FileDownloadMonitor.setGlobalMonitor(GlobalMonitor.getImpl());
         mActivity = this;
